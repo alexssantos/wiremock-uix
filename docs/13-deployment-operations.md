@@ -70,6 +70,19 @@ docker compose up
 
 ### 4.4 Publishing a new image
 
+**Automated (preferred)**: [`.github/workflows/docker-publish.yml`](../.github/workflows/docker-publish.yml) builds and pushes `alexssantos/wiremock-uix:<version>` + `:latest` to Docker Hub whenever a `vX.Y.Z` git tag is pushed:
+
+```powershell
+git tag vX.Y.Z
+git push origin vX.Y.Z
+# Watch the run:
+gh run watch --repo alexssantos/wiremock-uix
+```
+
+It can also be triggered manually from the Actions tab (or `gh workflow run docker-publish.yml -f version=X.Y.Z`) without needing a new tag. Requires the repository secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN` (Settings → Secrets and variables → Actions) — use a long-lived Docker Hub access token, since short-lived/temporary tokens will stop working once they expire.
+
+**Manual (fallback)**:
+
 ```powershell
 docker build -t alexssantos/wiremock-uix:latest -t alexssantos/wiremock-uix:<version> .
 docker login -u alexssantos --password-stdin   # pipe the PAT/password via stdin, never as a CLI flag
@@ -190,10 +203,22 @@ This is a straightforward Kustomize refactor once a second environment is actual
 1. Update `CHANGELOG.md` (`[Unreleased]` → new version section with date).
 2. Bump `package.json` `version`.
 3. `npm run build` locally to confirm a clean build.
-4. Build and push the Docker image with matching tags (`latest` + the version number) — §4.4.
+4. Commit, then tag the release in git (`git tag vX.Y.Z && git push origin vX.Y.Z`) — this automatically triggers `.github/workflows/docker-publish.yml`, which builds and pushes `alexssantos/wiremock-uix:X.Y.Z` + `:latest` (§4.4). Watch it with `gh run watch`.
 5. Update `k8s/wiremock-uix/deployment.yaml`'s image tag to the new version.
-6. Tag the release in git (`git tag vX.Y.Z && git push --tags`) and, if desired, create a GitHub Release referencing the changelog entry.
+6. If desired, create a GitHub Release referencing the changelog entry (`gh release create vX.Y.Z --notes "..."`).
 7. Apply the updated manifests to each environment (§5.4) and monitor the rollout (§5.4).
+
+### 7.1 Automated image publishing
+
+Every `vX.Y.Z` tag push builds and publishes the Docker image via GitHub Actions — no manual `docker build`/`docker push` needed for routine releases (§4.4 documents the manual fallback). The workflow requires two repository secrets:
+
+| Secret | Value |
+|---|---|
+| `DOCKERHUB_USERNAME` | `alexssantos` |
+| `DOCKERHUB_TOKEN` | A Docker Hub access token (Docker Hub → Account Settings → Security → Personal access tokens). Prefer a non-expiring or long-lived token — a short-lived/temporary token will silently stop working once it expires, and the workflow will fail at the `docker/login-action` step until the secret is rotated. |
+
+Rotate the token with: `gh secret set DOCKERHUB_TOKEN --repo alexssantos/wiremock-uix` (paste the new token when prompted, or pipe it via stdin).
+
 
 ## 8. Example Stub Mappings
 

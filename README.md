@@ -51,7 +51,7 @@ Requires a running WireMock instance reachable from the browser (start one with 
 
 ## Docker
 
-A production image is published on Docker Hub: **`alexssantos/wiremock-uix`** (`latest`, `1.0.0`).
+A production image is published on Docker Hub: **`alexssantos/wiremock-uix`** (`latest`, `1.1.0`, `1.0.0`). New versions are built and published automatically by [`.github/workflows/docker-publish.yml`](./.github/workflows/docker-publish.yml) whenever a `vX.Y.Z` git tag is pushed.
 
 ```powershell
 docker run -d -p 8081:8081 -e WIREMOCK_BASE_URL=http://localhost:8080 alexssantos/wiremock-uix:latest

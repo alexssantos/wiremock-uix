@@ -6,17 +6,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Planned
+- Sprint 7 — polish, UX refinements, automated test coverage (Vitest + Testing Library + MSW), accessibility/performance audit (see `docs/07-plano-sprints.md`)
+- CI pipeline (lint + typecheck + test) on pull requests
+- Code-splitting for the production bundle (Monaco/React Flow/Recharts currently ship in a single >1.4 MB chunk)
+- Richer scenario transition graph inferred from stub mappings' `requiredScenarioState`/`newScenarioState` (see `docs/12-roadmap.md`, v2)
+
+## [1.1.0] - 2026-07-07
+
 ### Added
 - `examples/sample-stub-mappings.json` — 30 example stub mappings across 3 sample REST APIs (Users, Products, Orders), usable both as a manual import file and as the source of the automatic startup seed for Docker Compose and Kubernetes
 - `docker/wiremock-seed/mappings/` — the same 30 stubs split into WireMock's native one-file-per-mapping format, bind-mounted into the `wiremock` service in `docker-compose.yml` so a fresh WireMock container is always pre-seeded
 - Kubernetes: `wiremock-seed-mappings` ConfigMap + `seed-example-mappings` initContainer on the `wiremock` StatefulSet, seeding a fresh PersistentVolumeClaim with the same 30 stubs without ever overwriting existing/edited mappings
 - `scripts/generate-wiremock-seed.mjs` (`npm run seed:generate`) — regenerates both per-file copies from `examples/sample-stub-mappings.json`
-
-### Planned
-- Sprint 7 — polish, UX refinements, automated test coverage (Vitest + Testing Library + MSW), accessibility/performance audit (see `docs/07-plano-sprints.md`)
-- CI pipeline (lint + typecheck + test + Docker build) on pull requests
-- Code-splitting for the production bundle (Monaco/React Flow/Recharts currently ship in a single >1.4 MB chunk)
-- Richer scenario transition graph inferred from stub mappings' `requiredScenarioState`/`newScenarioState` (see `docs/12-roadmap.md`, v2)
+- `.github/workflows/docker-publish.yml` — GitHub Actions workflow that builds and pushes `alexssantos/wiremock-uix` (tags: exact version + `latest`) to Docker Hub automatically whenever a `vX.Y.Z` git tag is pushed, or on demand via `workflow_dispatch`
 
 ## [1.0.0] - 2026-07-07
 

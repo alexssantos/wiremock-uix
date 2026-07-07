@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: wiremock-uix
-          image: alexssantos/wiremock-uix:1.0.0
+          image: alexssantos/wiremock-uix:1.1.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
