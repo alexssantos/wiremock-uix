@@ -484,8 +484,21 @@ export function StubMappingTable({ onImportRequested, onDeleteRequested }: StubM
               <Select
                 value={String(pageSize)}
                 onValueChange={(value) => {
-                  table.setPageSize(Number(value));
-                  table.setPageIndex(0);
+                  // Write pageSize and page directly to the URL in a single
+                  // update instead of calling table.setPageSize() followed by
+                  // table.setPageIndex(0): both of those route through
+                  // onPaginationChange, which derives its next state from the
+                  // pageIndex/pageSize captured in this render's closure. Two
+                  // synchronous calls before a re-render both read the same
+                  // stale pageSize, so the second call (setPageIndex) would
+                  // silently overwrite the URL's pageSize back to its old
+                  // value.
+                  setSearchParams((currentParams) => {
+                    const nextParams = new URLSearchParams(currentParams);
+                    nextParams.set("pageSize", value);
+                    nextParams.set("page", "1");
+                    return nextParams;
+                  });
                 }}
               >
                 <SelectTrigger className="w-28">

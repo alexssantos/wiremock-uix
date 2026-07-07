@@ -15,6 +15,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Code-splitting for the production bundle (Monaco/React Flow/Recharts currently ship in a single >1.4 MB chunk)
 - Richer scenario transition graph inferred from stub mappings' `requiredScenarioState`/`newScenarioState` (see `docs/12-roadmap.md`, v2)
 
+## [1.1.2] - 2026-07-08
+
+### Fixed
+- Page-size selector on the Stub Mappings list not actually changing how many rows are shown. The `Select`'s `onValueChange` called `table.setPageSize()` immediately followed by `table.setPageIndex(0)`; both route through `onPaginationChange`, which derives its next state from the `pageIndex`/`pageSize` captured in the current render's closure. Since both calls fire synchronously before a re-render, the second call read the same stale `pageSize` and silently overwrote the URL's `pageSize` back to its previous value. The handler now writes `pageSize` and `page` directly to the URL in a single `setSearchParams` call, the same pattern already used by the method-filter and favorites-only controls.
+
 ## [1.1.1] - 2026-07-08
 
 ### Fixed
