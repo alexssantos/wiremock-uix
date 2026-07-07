@@ -3,7 +3,7 @@
 > Based on `WireMock_Dashboard_UI_Specification.md` | Target: **WireMock Server 3.9.1**
 > This document is the **practical, actionable** plan for getting the project built. The full expanded technical specification (FSD architecture, design system, wireframes, 100% API mapping, TypeScript models, acceptance criteria, roadmap) lives in [`docs/`](./docs).
 >
-> **Implementation Status:** Sprint 0 is complete. Sprints 1–7 are in progress.
+> **Implementation Status:** Sprints 0–6 are implemented (Stub Mappings, Requests, Near Misses, Dashboard, Scenarios, Recording, Settings, Files, and Logs are all functional against a live WireMock admin API). Sprint 7 (polish, automated tests, a11y/perf audit) remains open. A Docker image is published — see [Section 9](#9-docker).
 
 ---
 
@@ -104,49 +104,49 @@ Dependency rule (Feature-Sliced Design): `app → pages → widgets → features
 
 ## 5. Phases and Sprints (2 weeks each)
 
-### Phase 0 — Foundation (Sprint 0, 1 week — already completed)
+### Phase 0 — Foundation (Sprint 0, 1 week — completed)
 - Project setup (Section 3), baseline CI (`oxlint` + typecheck + test on PRs)
 - HTTP client (`shared/api/wiremock-client.ts`) with a `fetch` wrapper, standardized error handling, and base types
 - Root layout: Header + Sidebar + persisted Light/Dark/System theme in LocalStorage
 - Initial routing with placeholders for all primary pages
 - **Deliverable**: the app is navigable, the theme works, and the project foundation is in place
 
-### Sprint 1 — Stub Mappings: Listing and Basic CRUD
+### Sprint 1 — Stub Mappings: Listing and Basic CRUD (completed)
 - `entities/stub-mapping`: types + hooks `useStubMappings`, `useStubMapping`, `useCreateStubMapping`, `useUpdateStubMapping`, `useDeleteStubMapping`
 - TanStack Table listing: search, pagination, filters by method/status/URL
 - Actions: create (simple form), edit, delete with confirmation (`AlertDialog`)
 - **Deliverable**: fully working CRUD against a real WireMock instance
 
-### Sprint 2 — Stub Mappings: Full Wizard
+### Sprint 2 — Stub Mappings: Full Wizard (completed)
 - Multi-tab wizard (Request / Response / Metadata / Preview) with React Hook Form + Zod
 - Advanced matcher editor (URL pattern, headers, query params, body patterns)
 - Preview with Monaco Editor (JSON generated in real time) + validation before saving
 - Duplicate/Clone, Import (JSON upload), Export
 - **Deliverable**: functional parity with native WireMock stub creation flows
 
-### Sprint 3 — Requests (Request Journal)
+### Sprint 3 — Requests (Request Journal) (completed)
 - Listing with filters (method, status, matched/unmatched, free text), pagination/infinite scroll
 - Detail drawer (headers, cookies, query, body, response, raw JSON)
 - Actions: Replay, Generate Stub from request, Export, Delete
 - **Deliverable**: a complete traffic investigation module
 
-### Sprint 4 — Near Misses + Dashboard
+### Sprint 4 — Near Misses + Dashboard (completed)
 - Near Misses: list with similarity score, diff viewer (expected vs. received), generate stub
 - Dashboard: metric cards (client-side aggregation from existing endpoints) + 4 charts (Recharts)
 - **Deliverable**: executive visibility into the mock server state
 
-### Sprint 5 — Scenarios + Recording
+### Sprint 5 — Scenarios + Recording (completed)
 - Scenarios: graph visualization (React Flow) for states and transitions, scenario reset
 - Recording: start/pause/stop/snapshot, proxy configuration, review captured stubs before persistence
 - **Deliverable**: advanced stub-generation workflows
 
-### Sprint 6 — Settings + Files + Logs
+### Sprint 6 — Settings + Files + Logs (completed)
 - Settings: global settings form (delay, proxy, journal, extensions)
 - Files: `__files` explorer with tree view + Monaco Editor + image preview
 - Logs: timeline with combined filters
 - **Deliverable**: 100% coverage of the original specification scope
 
-### Sprint 7 — Polish, UX, Performance, and Testing
+### Sprint 7 — Polish, UX, Performance, and Testing (not started)
 - Skeleton loading, optimistic updates, toasts, undo, keyboard shortcuts, global search (Cmd/Ctrl+K)
 - Unit tests (hooks, critical components) + integration tests using MSW to mock `/__admin`
 - Accessibility (a11y) and responsive design audit
@@ -182,6 +182,30 @@ Dependency rule (Feature-Sliced Design): `app → pages → widgets → features
 2. Validate `shared/api/wiremock-client.ts` against `VITE_WIREMOCK_BASE_URL`.
 3. Start Sprint 1 implementation for the Stub Mappings module.
 4. Review the full technical specification in `docs/` (see the index in `docs/README.md`) before expanding Sprint 1 delivery, so architecture, design system, and data model details remain aligned across the team.
+
+---
+
+## 9. Docker
+
+A production Docker image is built with a multi-stage `Dockerfile`:
+
+1. **Build stage** (`node:22-alpine`): `npm ci` + `npm run build` (`tsc -b && vite build`) produces static assets in `dist/`.
+2. **Runtime stage** (`nginx:1.27-alpine`): serves `dist/` with SPA-aware routing (`docker/nginx.conf`, `try_files ... /index.html`) on port `8081`.
+
+Because this dashboard is a browser-side SPA, the WireMock base URL cannot be baked in at build time if the image should be reusable across environments. Instead, `docker/docker-entrypoint.sh` regenerates `public/config.js` from the `WIREMOCK_BASE_URL` environment variable at **container startup** (via nginx's `/docker-entrypoint.d/` hook mechanism), and `src/shared/config/env.ts` reads `window.__WIREMOCK_UI_CONFIG__.wiremockBaseUrl` first, falling back to the build-time `VITE_WIREMOCK_BASE_URL` and then `http://localhost:8080`.
+
+```powershell
+# Pull and run the published image
+docker pull alexssantos/wiremock-uix:latest
+docker run -d -p 8081:8081 -e WIREMOCK_BASE_URL=http://localhost:8080 alexssantos/wiremock-uix:latest
+
+# Or with docker-compose (also starts a WireMock container)
+docker compose up
+```
+
+Published image: **`alexssantos/wiremock-uix`** — tags `latest` and `1.0.0` on Docker Hub.
+
+> Note: `WIREMOCK_BASE_URL` must be reachable from the **end user's browser**, not just from inside the Docker network — when running both containers via Compose, point it at the host-published WireMock address (e.g. `http://localhost:8080`), not the internal service name.
 
 ---
 
