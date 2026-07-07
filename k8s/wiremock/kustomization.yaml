@@ -4,3 +4,43 @@ namespace: wiremock-dashboard
 resources:
   - statefulset.yaml
   - service.yaml
+
+# 30 example stub mappings (3 sample REST APIs: Users, Products, Orders — see
+# ../../examples/sample-stub-mappings.json) baked into a ConfigMap so the
+# StatefulSet's initContainer can seed a fresh PersistentVolumeClaim on first
+# boot. Regenerate this file list with `node scripts/generate-wiremock-seed.mjs`
+# whenever examples/sample-stub-mappings.json changes.
+configMapGenerator:
+  - name: wiremock-seed-mappings
+    files:
+      - 01-users-api-list-all-users.json=seed-mappings/01-users-api-list-all-users.json
+      - 02-users-api-get-user-by-id.json=seed-mappings/02-users-api-get-user-by-id.json
+      - 03-users-api-get-user-not-found.json=seed-mappings/03-users-api-get-user-not-found.json
+      - 04-users-api-filter-users-by-role.json=seed-mappings/04-users-api-filter-users-by-role.json
+      - 05-users-api-search-users.json=seed-mappings/05-users-api-search-users.json
+      - 06-users-api-create-user.json=seed-mappings/06-users-api-create-user.json
+      - 07-users-api-create-user-validation-error.json=seed-mappings/07-users-api-create-user-validation-error.json
+      - 08-users-api-update-user.json=seed-mappings/08-users-api-update-user.json
+      - 09-users-api-delete-user.json=seed-mappings/09-users-api-delete-user.json
+      - 10-users-api-unauthorized-missing-authorization-header.json=seed-mappings/10-users-api-unauthorized-missing-authorization-header.json
+      - 11-products-api-list-all-products.json=seed-mappings/11-products-api-list-all-products.json
+      - 12-products-api-get-product-by-id.json=seed-mappings/12-products-api-get-product-by-id.json
+      - 13-products-api-get-product-not-found.json=seed-mappings/13-products-api-get-product-not-found.json
+      - 14-products-api-filter-products-by-category.json=seed-mappings/14-products-api-filter-products-by-category.json
+      - 15-products-api-create-product.json=seed-mappings/15-products-api-create-product.json
+      - 16-products-api-update-product.json=seed-mappings/16-products-api-update-product.json
+      - 17-products-api-delete-product.json=seed-mappings/17-products-api-delete-product.json
+      - 18-products-api-list-product-reviews.json=seed-mappings/18-products-api-list-product-reviews.json
+      - 19-products-api-update-product-stock.json=seed-mappings/19-products-api-update-product-stock.json
+      - 20-products-api-slow-response-latency-simulation.json=seed-mappings/20-products-api-slow-response-latency-simulation.json
+      - 21-orders-api-list-all-orders.json=seed-mappings/21-orders-api-list-all-orders.json
+      - 22-orders-api-get-order-by-id.json=seed-mappings/22-orders-api-get-order-by-id.json
+      - 23-orders-api-get-order-not-found.json=seed-mappings/23-orders-api-get-order-not-found.json
+      - 24-orders-api-filter-orders-by-status.json=seed-mappings/24-orders-api-filter-orders-by-status.json
+      - 25-orders-api-create-order.json=seed-mappings/25-orders-api-create-order.json
+      - 26-orders-api-create-order-out-of-stock-conflict.json=seed-mappings/26-orders-api-create-order-out-of-stock-conflict.json
+      - 27-orders-api-cancel-order.json=seed-mappings/27-orders-api-cancel-order.json
+      - 28-orders-api-list-order-items.json=seed-mappings/28-orders-api-list-order-items.json
+      - 29-orders-api-get-order-invoice.json=seed-mappings/29-orders-api-get-order-invoice.json
+      - 30-orders-api-simulated-server-fault.json=seed-mappings/30-orders-api-simulated-server-fault.json
+

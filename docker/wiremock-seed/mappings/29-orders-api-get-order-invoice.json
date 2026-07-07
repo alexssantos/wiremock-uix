@@ -1,0 +1,21 @@
+{
+  "id": "c3c3c3c3-0009-4c00-8c00-000000000009",
+  "uuid": "c3c3c3c3-0009-4c00-8c00-000000000009",
+  "name": "Orders API - Get order invoice",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/orders/5001/invoice"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "orderId": 5001,
+      "invoiceNumber": "INV-2024-005001",
+      "issuedAt": "2024-02-01T09:30:00Z",
+      "total": 129.9
+    }
+  }
+}

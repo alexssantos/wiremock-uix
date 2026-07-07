@@ -1,0 +1,34 @@
+{
+  "id": "c3c3c3c3-0004-4c00-8c00-000000000004",
+  "uuid": "c3c3c3c3-0004-4c00-8c00-000000000004",
+  "name": "Orders API - Filter orders by status",
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/orders",
+    "queryParameters": {
+      "status": {
+        "equalTo": "pending"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "data": [
+        {
+          "id": 5001,
+          "status": "pending",
+          "total": 129.9,
+          "customerId": 1
+        }
+      ],
+      "meta": {
+        "total": 1
+      }
+    }
+  }
+}

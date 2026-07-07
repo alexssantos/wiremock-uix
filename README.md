@@ -30,6 +30,14 @@ npm run dev
 
 Requires a running WireMock instance reachable from the browser (start one with `docker run -p 8080:8080 wiremock/wiremock:3.9.1`, and enable CORS/browser proxying as needed).
 
+## Example Stub Mappings
+
+[`examples/sample-stub-mappings.json`](./examples/sample-stub-mappings.json) ships **30 ready-to-use stub mappings across 3 sample REST APIs** (Users, Products, Orders — 10 routes each), covering common patterns: CRUD, query-parameter filtering, path/header/body matching, priorities, validation errors, latency simulation, and fault injection. Full list in [`docs/13-deployment-operations.md#example-stub-mappings`](./docs/13-deployment-operations.md#8-example-stub-mappings).
+
+- **Manual import**: open the dashboard → Stub Mappings → *Import* → select `examples/sample-stub-mappings.json`.
+- **Automatic on startup**: `docker compose up` mounts [`docker/wiremock-seed/mappings`](./docker/wiremock-seed) (one file per stub — WireMock's native format) into the WireMock container, which auto-loads every `*.json` file in its `mappings` directory at boot. `kubectl apply -k k8s/` does the equivalent via a ConfigMap + initContainer that seeds a fresh PVC (existing/edited mappings are never overwritten).
+- Regenerate both per-file copies after editing `examples/sample-stub-mappings.json`: `npm run seed:generate`.
+
 ### Scripts
 
 | Command | Description |
@@ -39,6 +47,7 @@ Requires a running WireMock instance reachable from the browser (start one with 
 | `npm run preview` | Serve the production build locally |
 | `npm run lint` | Run oxlint |
 | `npm run test` | Run the Vitest suite |
+| `npm run seed:generate` | Regenerate per-file example stub mappings (Docker + Kubernetes seed) from `examples/sample-stub-mappings.json` |
 
 ## Docker
 

@@ -1,0 +1,22 @@
+{
+  "id": "b2b2b2b2-0002-4b00-8b00-000000000002",
+  "uuid": "b2b2b2b2-0002-4b00-8b00-000000000002",
+  "name": "Products API - Get product by id",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/products/101"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 101,
+      "name": "Mechanical Keyboard",
+      "category": "electronics",
+      "price": 89.9,
+      "stock": 42
+    }
+  }
+}

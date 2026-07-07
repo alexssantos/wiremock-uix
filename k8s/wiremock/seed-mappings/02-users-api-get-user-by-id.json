@@ -1,0 +1,22 @@
+{
+  "id": "a1a1a1a1-0002-4a00-8a00-000000000002",
+  "uuid": "a1a1a1a1-0002-4a00-8a00-000000000002",
+  "name": "Users API - Get user by id",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/users/1"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 1,
+      "name": "Ada Lovelace",
+      "email": "ada@example.com",
+      "role": "admin",
+      "createdAt": "2024-01-15T10:00:00Z"
+    }
+  }
+}

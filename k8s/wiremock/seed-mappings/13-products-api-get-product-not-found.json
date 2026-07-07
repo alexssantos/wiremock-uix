@@ -1,0 +1,19 @@
+{
+  "id": "b2b2b2b2-0003-4b00-8b00-000000000003",
+  "uuid": "b2b2b2b2-0003-4b00-8b00-000000000003",
+  "name": "Products API - Get product not found",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/products/9999"
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "Not Found",
+      "message": "Product 9999 does not exist"
+    }
+  }
+}

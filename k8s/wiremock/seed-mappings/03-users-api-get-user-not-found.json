@@ -1,0 +1,19 @@
+{
+  "id": "a1a1a1a1-0003-4a00-8a00-000000000003",
+  "uuid": "a1a1a1a1-0003-4a00-8a00-000000000003",
+  "name": "Users API - Get user not found",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/users/999"
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "Not Found",
+      "message": "User 999 does not exist"
+    }
+  }
+}

@@ -36,6 +36,32 @@ spec:
         app.kubernetes.io/name: wiremock
         app.kubernetes.io/part-of: wiremock-dashboard
     spec:
+      # Seeds a brand-new PersistentVolumeClaim with 30 example stub mappings
+      # (3 sample REST APIs: Users, Products, Orders) on first boot only. If
+      # /home/wiremock/mappings already has files — e.g. after a pod restart,
+      # or once a user has added/edited mappings through the dashboard — this
+      # is a no-op, so persisted changes are never overwritten.
+      initContainers:
+        - name: seed-example-mappings
+          image: busybox:1.36
+          command:
+            - "sh"
+            - "-c"
+            - |
+              set -e
+              mkdir -p /home/wiremock/mappings
+              if [ -z "$(ls -A /home/wiremock/mappings 2>/dev/null)" ]; then
+                echo "Seeding 30 example stub mappings (Users, Products, Orders sample APIs)"
+                cp /seed/*.json /home/wiremock/mappings/
+              else
+                echo "wiremock/mappings already has content — skipping example seed"
+              fi
+          volumeMounts:
+            - name: wiremock-data
+              mountPath: /home/wiremock
+            - name: seed-mappings
+              mountPath: /seed
+              readOnly: true
       containers:
         - name: wiremock
           image: wiremock/wiremock:3.9.1
@@ -73,6 +99,10 @@ spec:
             periodSeconds: 20
             timeoutSeconds: 3
             failureThreshold: 3
+      volumes:
+        - name: seed-mappings
+          configMap:
+            name: wiremock-seed-mappings
   volumeClaimTemplates:
     - metadata:
         name: wiremock-data

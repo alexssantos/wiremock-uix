@@ -1,0 +1,24 @@
+{
+  "id": "b2b2b2b2-0009-4b00-8b00-000000000009",
+  "uuid": "b2b2b2b2-0009-4b00-8b00-000000000009",
+  "name": "Products API - Update product stock",
+  "request": {
+    "method": "PATCH",
+    "urlPath": "/api/products/101/stock",
+    "bodyPatterns": [
+      {
+        "matchesJsonPath": "$.quantity"
+      }
+    ]
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 101,
+      "stock": 40
+    }
+  }
+}

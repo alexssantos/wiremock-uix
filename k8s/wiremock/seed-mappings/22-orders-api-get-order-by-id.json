@@ -1,0 +1,21 @@
+{
+  "id": "c3c3c3c3-0002-4c00-8c00-000000000002",
+  "uuid": "c3c3c3c3-0002-4c00-8c00-000000000002",
+  "name": "Orders API - Get order by id",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/orders/5001"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 5001,
+      "status": "pending",
+      "total": 129.9,
+      "customerId": 1
+    }
+  }
+}

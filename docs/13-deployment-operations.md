@@ -62,7 +62,7 @@ docker run -d -p 8081:8081 -e WIREMOCK_BASE_URL=http://localhost:8080 alexssanto
 
 ### 4.3 docker-compose
 
-[`docker-compose.yml`](../docker-compose.yml) starts both WireMock and the dashboard for local end-to-end testing:
+[`docker-compose.yml`](../docker-compose.yml) starts both WireMock and the dashboard for local end-to-end testing, with WireMock automatically seeded with 30 example stub mappings (see [§8](#8-example-stub-mappings)):
 
 ```powershell
 docker compose up
@@ -96,9 +96,10 @@ k8s/
     ingress.yaml
     kustomization.yaml
   wiremock/                 # optional companion WireMock server — StatefulSet
-    statefulset.yaml
+    statefulset.yaml         # includes an initContainer that seeds example stubs (see §8)
     service.yaml
-    kustomization.yaml
+    kustomization.yaml       # also declares the wiremock-seed-mappings ConfigMap
+    seed-mappings/           # generated: one JSON file per example stub (do not edit by hand)
 ```
 
 ### 5.1 Why Deployment for `wiremock-uix` and StatefulSet for `wiremock`
@@ -141,6 +142,7 @@ kubectl apply -k k8s/wiremock-uix/
 | Probes | `deployment.yaml` | Both liveness and readiness hit `GET /` on port `8081` (nginx serving `index.html`). |
 | Ingress host/TLS | `ingress.yaml` | Placeholder host `wiremock-dashboard.example.com`; uncomment the `tls` block once a certificate/secret exists. |
 | WireMock persistent storage | `k8s/wiremock/statefulset.yaml` (`volumeClaimTemplates`) | 2Gi `ReadWriteOnce` PVC mounted at `/home/wiremock` (mappings + `__files`); set `storageClassName` to match your cluster. |
+| Example stub seeding | `k8s/wiremock/statefulset.yaml` (`initContainers`), `k8s/wiremock/kustomization.yaml` (`configMapGenerator`) | Seeds 30 example stubs onto a fresh PVC only; see §8. |
 
 ### 5.4 Rolling updates & rollback
 
@@ -192,3 +194,31 @@ This is a straightforward Kustomize refactor once a second environment is actual
 5. Update `k8s/wiremock-uix/deployment.yaml`'s image tag to the new version.
 6. Tag the release in git (`git tag vX.Y.Z && git push --tags`) and, if desired, create a GitHub Release referencing the changelog entry.
 7. Apply the updated manifests to each environment (§5.4) and monitor the rollout (§5.4).
+
+## 8. Example Stub Mappings
+
+[`examples/sample-stub-mappings.json`](../examples/sample-stub-mappings.json) is the **single source of truth** for 30 example stub mappings across 3 sample REST APIs, meant both as a ready-to-explore default dataset and as a reference for the dashboard's bulk-import format (`{ "mappings": [...] }`, the same shape WireMock's `/__admin/mappings/import` endpoint accepts).
+
+| API | Base path | Routes (10 each) |
+|---|---|---|
+| Users | `/api/users` | list, get by id, 404, filter by `role`, search, create, validation error (400), update, delete, unauthorized (401, missing `Authorization`) |
+| Products | `/api/products` | list, get by id, 404, filter by `category`, create, update, delete, nested reviews, patch stock, simulated latency (`fixedDelayMilliseconds`) |
+| Orders | `/api/orders` | list, get by id, 404, filter by `status`, create, conflict (409, header-triggered), cancel, nested items, invoice, simulated fault (`EMPTY_RESPONSE`) |
+
+### 8.1 Two ways to get the examples loaded
+
+1. **Manual import (any environment)** — dashboard → *Stub Mappings* → *Import* → select `examples/sample-stub-mappings.json`. Works against any WireMock instance, including ones you don't control the startup of.
+2. **Automatic on startup (local dev / self-hosted stack)** — `docker compose up` (§4.3) and `kubectl apply -k k8s/` (§5.2) both seed a fresh WireMock instance with the same 30 stubs automatically, using two different native mechanisms:
+   - **Docker Compose**: [`docker/wiremock-seed/mappings/`](../docker/wiremock-seed/mappings) (one JSON file per stub mapping — WireMock's native `mappings` folder format) is bind-mounted read-only into the `wiremock` container at `/home/wiremock/mappings`. WireMock auto-loads every `*.json` file there on boot — no custom code involved.
+   - **Kubernetes**: the same per-file mappings, copied to [`k8s/wiremock/seed-mappings/`](../k8s/wiremock/seed-mappings) (required to live under `k8s/wiremock/` because Kustomize's `configMapGenerator` refuses file references outside the kustomization root), are packaged into a `wiremock-seed-mappings` ConfigMap. The StatefulSet's `seed-example-mappings` initContainer copies them onto the PersistentVolumeClaim **only if `/home/wiremock/mappings` is still empty** — so a pod restart, or a PVC that already has user-created/edited mappings, is never overwritten.
+
+### 8.2 Regenerating the per-file copies
+
+Both per-file copies are generated from `examples/sample-stub-mappings.json` — never edit the generated files directly:
+
+```powershell
+npm run seed:generate
+```
+
+This re-splits the bulk file into `docker/wiremock-seed/mappings/*.json` and `k8s/wiremock/seed-mappings/*.json` (see [`scripts/generate-wiremock-seed.mjs`](../scripts/generate-wiremock-seed.mjs)). Re-run it, then re-apply/rebuild, whenever you add, remove, or edit an example stub.
+

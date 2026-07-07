@@ -1,0 +1,19 @@
+{
+  "id": "c3c3c3c3-0003-4c00-8c00-000000000003",
+  "uuid": "c3c3c3c3-0003-4c00-8c00-000000000003",
+  "name": "Orders API - Get order not found",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/orders/9999"
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "Not Found",
+      "message": "Order 9999 does not exist"
+    }
+  }
+}

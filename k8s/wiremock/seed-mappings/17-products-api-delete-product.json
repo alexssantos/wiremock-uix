@@ -1,0 +1,12 @@
+{
+  "id": "b2b2b2b2-0007-4b00-8b00-000000000007",
+  "uuid": "b2b2b2b2-0007-4b00-8b00-000000000007",
+  "name": "Products API - Delete product",
+  "request": {
+    "method": "DELETE",
+    "urlPath": "/api/products/101"
+  },
+  "response": {
+    "status": 204
+  }
+}

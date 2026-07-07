@@ -1,0 +1,26 @@
+{
+  "id": "a1a1a1a1-0007-4a00-8a00-000000000007",
+  "uuid": "a1a1a1a1-0007-4a00-8a00-000000000007",
+  "name": "Users API - Create user validation error",
+  "priority": 1,
+  "request": {
+    "method": "POST",
+    "urlPath": "/api/users",
+    "bodyPatterns": [
+      {
+        "equalToJson": "{\"email\":\"\"}",
+        "ignoreExtraElements": true
+      }
+    ]
+  },
+  "response": {
+    "status": 400,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "Bad Request",
+      "message": "email must not be empty"
+    }
+  }
+}

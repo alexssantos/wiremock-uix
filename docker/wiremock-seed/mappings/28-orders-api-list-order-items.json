@@ -1,0 +1,31 @@
+{
+  "id": "c3c3c3c3-0008-4c00-8c00-000000000008",
+  "uuid": "c3c3c3c3-0008-4c00-8c00-000000000008",
+  "name": "Orders API - List order items",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/orders/5001/items"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "data": [
+        {
+          "productId": 101,
+          "name": "Mechanical Keyboard",
+          "quantity": 1,
+          "price": 89.9
+        },
+        {
+          "productId": 102,
+          "name": "Standing Desk",
+          "quantity": 1,
+          "price": 40
+        }
+      ]
+    }
+  }
+}

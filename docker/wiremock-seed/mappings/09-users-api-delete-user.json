@@ -1,0 +1,12 @@
+{
+  "id": "a1a1a1a1-0009-4a00-8a00-000000000009",
+  "uuid": "a1a1a1a1-0009-4a00-8a00-000000000009",
+  "name": "Users API - Delete user",
+  "request": {
+    "method": "DELETE",
+    "urlPath": "/api/users/1"
+  },
+  "response": {
+    "status": 204
+  }
+}

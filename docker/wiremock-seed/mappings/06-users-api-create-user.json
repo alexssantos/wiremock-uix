@@ -1,0 +1,27 @@
+{
+  "id": "a1a1a1a1-0006-4a00-8a00-000000000006",
+  "uuid": "a1a1a1a1-0006-4a00-8a00-000000000006",
+  "name": "Users API - Create user",
+  "request": {
+    "method": "POST",
+    "urlPath": "/api/users",
+    "headers": {
+      "Content-Type": {
+        "contains": "application/json"
+      }
+    }
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/json",
+      "Location": "/api/users/3"
+    },
+    "jsonBody": {
+      "id": 3,
+      "name": "New User",
+      "email": "new.user@example.com",
+      "role": "member"
+    }
+  }
+}

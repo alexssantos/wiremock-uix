@@ -5,6 +5,13 @@ services:
     ports:
       - "8090:8080"
     command: ["--global-response-templating", "--verbose"]
+    volumes:
+      # WireMock auto-loads every *.json file in this directory as a stub
+      # mapping on startup, seeding 30 example stubs (Users, Products, Orders
+      # sample APIs — see examples/sample-stub-mappings.json). Mounted
+      # read-only so edits made through the dashboard are kept in the
+      # container's own filesystem, not written back to the repo.
+      - ./docker/wiremock-seed/mappings:/home/wiremock/mappings:ro
 
   wiremock-ui:
     image: alexssantos/wiremock-uix:latest

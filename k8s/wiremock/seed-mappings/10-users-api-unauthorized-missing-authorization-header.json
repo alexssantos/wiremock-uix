@@ -1,0 +1,25 @@
+{
+  "id": "a1a1a1a1-0010-4a00-8a00-000000000010",
+  "uuid": "a1a1a1a1-0010-4a00-8a00-000000000010",
+  "name": "Users API - Unauthorized (missing Authorization header)",
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/users",
+    "headers": {
+      "Authorization": {
+        "absent": true
+      }
+    }
+  },
+  "response": {
+    "status": 401,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "error": "Unauthorized",
+      "message": "Missing bearer token"
+    }
+  }
+}

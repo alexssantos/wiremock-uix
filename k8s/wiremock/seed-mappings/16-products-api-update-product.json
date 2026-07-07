@@ -1,0 +1,22 @@
+{
+  "id": "b2b2b2b2-0006-4b00-8b00-000000000006",
+  "uuid": "b2b2b2b2-0006-4b00-8b00-000000000006",
+  "name": "Products API - Update product",
+  "request": {
+    "method": "PUT",
+    "urlPath": "/api/products/101"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 101,
+      "name": "Mechanical Keyboard Pro",
+      "category": "electronics",
+      "price": 99.9,
+      "stock": 42
+    }
+  }
+}

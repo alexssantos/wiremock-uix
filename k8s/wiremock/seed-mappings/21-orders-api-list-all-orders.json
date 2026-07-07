@@ -1,0 +1,36 @@
+{
+  "id": "c3c3c3c3-0001-4c00-8c00-000000000001",
+  "uuid": "c3c3c3c3-0001-4c00-8c00-000000000001",
+  "name": "Orders API - List all orders",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/orders"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "data": [
+        {
+          "id": 5001,
+          "status": "pending",
+          "total": 129.9,
+          "customerId": 1
+        },
+        {
+          "id": 5002,
+          "status": "shipped",
+          "total": 349,
+          "customerId": 2
+        }
+      ],
+      "meta": {
+        "total": 2,
+        "page": 1,
+        "pageSize": 20
+      }
+    }
+  }
+}

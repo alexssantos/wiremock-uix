@@ -1,0 +1,33 @@
+{
+  "id": "a1a1a1a1-0005-4a00-8a00-000000000005",
+  "uuid": "a1a1a1a1-0005-4a00-8a00-000000000005",
+  "name": "Users API - Search users",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/users/search",
+    "queryParameters": {
+      "q": {
+        "equalTo": "ada"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "data": [
+        {
+          "id": 1,
+          "name": "Ada Lovelace",
+          "email": "ada@example.com",
+          "role": "admin"
+        }
+      ],
+      "meta": {
+        "total": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "b2b2b2b2-0010-4b00-8b00-000000000010",
+  "uuid": "b2b2b2b2-0010-4b00-8b00-000000000010",
+  "name": "Products API - Slow response (latency simulation)",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/products/slow"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "fixedDelayMilliseconds": 3000,
+    "jsonBody": {
+      "data": [],
+      "meta": {
+        "total": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "a1a1a1a1-0001-4a00-8a00-000000000001",
+  "uuid": "a1a1a1a1-0001-4a00-8a00-000000000001",
+  "name": "Users API - List all users",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/users"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "data": [
+        {
+          "id": 1,
+          "name": "Ada Lovelace",
+          "email": "ada@example.com",
+          "role": "admin"
+        },
+        {
+          "id": 2,
+          "name": "Alan Turing",
+          "email": "alan@example.com",
+          "role": "member"
+        }
+      ],
+      "meta": {
+        "total": 2,
+        "page": 1,
+        "pageSize": 20
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "c3c3c3c3-0007-4c00-8c00-000000000007",
+  "uuid": "c3c3c3c3-0007-4c00-8c00-000000000007",
+  "name": "Orders API - Cancel order",
+  "request": {
+    "method": "PUT",
+    "urlPath": "/api/orders/5001/cancel"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 5001,
+      "status": "canceled"
+    }
+  }
+}

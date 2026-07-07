@@ -1,0 +1,28 @@
+{
+  "id": "b2b2b2b2-0008-4b00-8b00-000000000008",
+  "uuid": "b2b2b2b2-0008-4b00-8b00-000000000008",
+  "name": "Products API - List product reviews",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/products/101/reviews"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "data": [
+        {
+          "id": 1,
+          "author": "Grace Hopper",
+          "rating": 5,
+          "comment": "Excellent build quality."
+        }
+      ],
+      "meta": {
+        "total": 1
+      }
+    }
+  }
+}

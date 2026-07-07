@@ -1,0 +1,21 @@
+{
+  "id": "a1a1a1a1-0008-4a00-8a00-000000000008",
+  "uuid": "a1a1a1a1-0008-4a00-8a00-000000000008",
+  "name": "Users API - Update user",
+  "request": {
+    "method": "PUT",
+    "urlPath": "/api/users/1"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "id": 1,
+      "name": "Ada Lovelace",
+      "email": "ada.lovelace@example.com",
+      "role": "admin"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "c3c3c3c3-0010-4c00-8c00-000000000010",
+  "uuid": "c3c3c3c3-0010-4c00-8c00-000000000010",
+  "name": "Orders API - Simulated server fault",
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/orders/error"
+  },
+  "response": {
+    "fault": "EMPTY_RESPONSE"
+  }
+}

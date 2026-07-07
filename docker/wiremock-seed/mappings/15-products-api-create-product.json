@@ -1,0 +1,23 @@
+{
+  "id": "b2b2b2b2-0005-4b00-8b00-000000000005",
+  "uuid": "b2b2b2b2-0005-4b00-8b00-000000000005",
+  "name": "Products API - Create product",
+  "request": {
+    "method": "POST",
+    "urlPath": "/api/products"
+  },
+  "response": {
+    "status": 201,
+    "headers": {
+      "Content-Type": "application/json",
+      "Location": "/api/products/103"
+    },
+    "jsonBody": {
+      "id": 103,
+      "name": "New Product",
+      "category": "uncategorized",
+      "price": 0,
+      "stock": 0
+    }
+  }
+}
