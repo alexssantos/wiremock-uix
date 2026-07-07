@@ -5,7 +5,6 @@ import {
   stubMappingRequestMatcherOperatorValues,
   stubMappingResponseBodyModeValues,
   stubMappingUrlMatchTypeValues,
-  type StubMapping,
 } from "@/entities/stub-mapping";
 
 const httpMethodValues = ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS", "TRACE", "ANY"] as const;
@@ -77,7 +76,12 @@ const responseHeaderSchema = z.object({
 export const stubMappingFormSchema = z.object({
   id: z.string().optional(),
   uuid: z.string().optional(),
-  baseStub: z.custom<StubMapping>().optional(),
+  // Typed as `unknown` (not `StubMapping`) so react-hook-form's generic
+  // `Path<T>`/`FieldErrors<T>` utility types don't have to recurse through
+  // `ContentPattern`'s self-referential union (And/Or/Not patterns), which
+  // otherwise triggers "type instantiation is excessively deep" errors.
+  // Cast back to `StubMapping` at the few read sites that need it.
+  baseStub: z.custom<unknown>().optional(),
   name: z.string(),
   persistent: z.boolean(),
   priority: z.number().int().min(1, "Priority must be at least 1.").nullable(),

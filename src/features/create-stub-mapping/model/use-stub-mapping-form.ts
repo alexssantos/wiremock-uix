@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type {
   ContentPattern,
@@ -234,7 +234,7 @@ function buildStubMappingFormValues(stubMapping?: StubMapping): StubMappingFormV
 
 export function useStubMappingForm(defaultValues?: StubMapping) {
   const form = useForm<StubMappingFormValues>({
-    resolver: zodResolver(stubMappingFormSchema),
+    resolver: zodResolver(stubMappingFormSchema) as Resolver<StubMappingFormValues>,
     defaultValues: buildStubMappingFormValues(defaultValues),
   });
 
