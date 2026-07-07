@@ -1,0 +1,33 @@
+# Example Ingress using the ingress-nginx controller. Adjust
+# ingressClassName / annotations to match your cluster's ingress controller
+# (e.g. Traefik, AWS ALB, GKE). Update `host` before applying, and uncomment
+# the `tls` block once a cert-manager Certificate (or equivalent) exists for
+# that host.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wiremock-uix
+  namespace: wiremock-dashboard
+  labels:
+    app.kubernetes.io/name: wiremock-uix
+    app.kubernetes.io/part-of: wiremock-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: wiremock-dashboard.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wiremock-uix
+                port:
+                  name: http
+  # tls:
+  #   - hosts:
+  #       - wiremock-dashboard.example.com
+  #     secretName: wiremock-dashboard-tls

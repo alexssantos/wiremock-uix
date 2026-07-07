@@ -23,6 +23,7 @@
 | 10 | [UI/UX Guide](./10-guia-ux-ui.md) | UX principles, interface states, microcopy, Figma-ready checklist |
 | 11 | [Acceptance Criteria](./11-criterios-aceite.md) | Acceptance criteria (Given/When/Then) by feature |
 | 12 | [Roadmap v1 → v2 → v3](./12-roadmap.md) | Product evolution beyond v1.0 |
+| 13 | [Deployment & Operations Guide](./13-deployment-operations.md) | Docker image build/config, Kubernetes manifests (Deployment vs. StatefulSet), rollout/rollback, troubleshooting, release checklist |
 
 ## How to Use This Specification
 
@@ -31,6 +32,7 @@
 - **For WireMock API integration**: `05-mapeamento-endpoints.md` and `06-modelos-typescript.md` are the source of truth (based on the official WireMock OpenAPI specification).
 - **For QA / "done" criteria**: `11-criterios-aceite.md`, cross-referenced with `03-fluxos-navegacao.md`.
 - **For product/stakeholder vision**: `00-visao-geral.md` and `12-roadmap.md`.
+- **For deploying/operating the app**: `13-deployment-operations.md`, cross-referenced with `../CHANGELOG.md` and `../k8s/`.
 
 ## Status of This Specification
 
@@ -49,3 +51,4 @@
 | 10 — UI/UX Guide | ✅ Complete |
 | 11 — Acceptance Criteria | ✅ Complete |
 | 12 — Roadmap | ✅ Complete |
+| 13 — Deployment & Operations Guide | ✅ Complete |

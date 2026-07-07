@@ -1,0 +1,37 @@
+# Headless service required for the StatefulSet's stable per-pod DNS
+# identity (wiremock-0.wiremock-headless.wiremock-dashboard.svc.cluster.local).
+apiVersion: v1
+kind: Service
+metadata:
+  name: wiremock-headless
+  namespace: wiremock-dashboard
+  labels:
+    app.kubernetes.io/name: wiremock
+    app.kubernetes.io/part-of: wiremock-dashboard
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: wiremock
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+# Regular ClusterIP service for normal client access (e.g. from
+# wiremock-uix's WIREMOCK_BASE_URL, or from an Ingress in front of WireMock).
+apiVersion: v1
+kind: Service
+metadata:
+  name: wiremock
+  namespace: wiremock-dashboard
+  labels:
+    app.kubernetes.io/name: wiremock
+    app.kubernetes.io/part-of: wiremock-dashboard
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: wiremock
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

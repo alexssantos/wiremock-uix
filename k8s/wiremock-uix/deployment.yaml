@@ -1,0 +1,75 @@
+# wiremock-uix is a stateless SPA served by nginx: any pod can serve any
+# request and no pod holds unique local state, so a Deployment (not a
+# StatefulSet) is the correct workload type here. Scale horizontally by
+# bumping `replicas` or attaching the HorizontalPodAutoscaler in hpa.yaml.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wiremock-uix
+  namespace: wiremock-dashboard
+  labels:
+    app.kubernetes.io/name: wiremock-uix
+    app.kubernetes.io/part-of: wiremock-dashboard
+    app.kubernetes.io/version: "1.0.0"
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: wiremock-uix
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wiremock-uix
+        app.kubernetes.io/part-of: wiremock-dashboard
+    spec:
+      containers:
+        - name: wiremock-uix
+          image: alexssantos/wiremock-uix:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8081
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: wiremock-uix-config
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 2
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            # The official nginx:alpine image starts its master process as
+            # root and drops privileges internally for worker processes; it
+            # also needs a writable filesystem to render config.js and nginx
+            # runtime files (pid/cache/logs), so readOnlyRootFilesystem is
+            # left disabled here. Swap to an "nginx-unprivileged" base image
+            # in the Dockerfile if a stricter, fully non-root pod is required.
+      restartPolicy: Always

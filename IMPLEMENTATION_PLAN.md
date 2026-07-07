@@ -207,6 +207,8 @@ Published image: **`alexssantos/wiremock-uix`** — tags `latest` and `1.0.0` on
 
 > Note: `WIREMOCK_BASE_URL` must be reachable from the **end user's browser**, not just from inside the Docker network — when running both containers via Compose, point it at the host-published WireMock address (e.g. `http://localhost:8080`), not the internal service name.
 
+For Kubernetes deployment (Deployment vs. StatefulSet rationale, manifests, rollout/rollback, troubleshooting) and the full release checklist, see [`docs/13-deployment-operations.md`](./docs/13-deployment-operations.md). Release history is tracked in [`CHANGELOG.md`](./CHANGELOG.md).
+
 ---
 
 📄 See the full detailed technical specification in [`docs/`](./docs).

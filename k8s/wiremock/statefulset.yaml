@@ -1,0 +1,86 @@
+# The WireMock server itself is optional in this repo's scope (the
+# wiremock-uix Deployment can point at any existing WireMock instance), but
+# this StatefulSet is provided for clusters that want to run WireMock
+# alongside the dashboard with persistent mappings/files storage.
+#
+# Why StatefulSet (not Deployment) here: WireMock keeps stub mappings,
+# request journal, scenario state, and uploaded __files either in memory or
+# on local disk (/home/wiremock). A StatefulSet gives it a stable pod
+# identity and a durable PersistentVolumeClaim (via volumeClaimTemplates)
+# that survives pod restarts/rescheduling, so mappings/files persisted to
+# disk (`persistent: true` stub mappings, uploaded files) aren't lost.
+#
+# Note on scaling: WireMock's in-memory state (scenarios, request journal,
+# non-persistent stubs) is NOT shared across replicas. Keep `replicas: 1`
+# unless you have an external/shared state strategy — this manifest
+# intentionally does not attempt horizontal scaling of WireMock itself.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: wiremock
+  namespace: wiremock-dashboard
+  labels:
+    app.kubernetes.io/name: wiremock
+    app.kubernetes.io/part-of: wiremock-dashboard
+spec:
+  serviceName: wiremock-headless
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: wiremock
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: wiremock
+        app.kubernetes.io/part-of: wiremock-dashboard
+    spec:
+      containers:
+        - name: wiremock
+          image: wiremock/wiremock:3.9.1
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--global-response-templating"
+            - "--verbose"
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: wiremock-data
+              mountPath: /home/wiremock
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /__admin/health
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /__admin/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+  volumeClaimTemplates:
+    - metadata:
+        name: wiremock-data
+        labels:
+          app.kubernetes.io/name: wiremock
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 2Gi
+        # storageClassName: standard   # set to match your cluster's default/available StorageClass

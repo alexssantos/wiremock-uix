@@ -3,7 +3,7 @@ services:
     image: wiremock/wiremock:3.9.1
     container_name: wiremock
     ports:
-      - "8080:8080"
+      - "8090:8080"
     command: ["--global-response-templating", "--verbose"]
 
   wiremock-ui:
@@ -14,11 +14,11 @@ services:
     #   dockerfile: Dockerfile
     container_name: wiremock-ui
     ports:
-      - "8081:8081"
+      - "8091:8081"
     environment:
       # NOTE: this dashboard is a browser-side SPA, so WIREMOCK_BASE_URL must
       # be reachable from the user's browser (not just from inside the Docker
       # network) — use the host-published address, not the service name.
-      WIREMOCK_BASE_URL: http://localhost:8080
+      WIREMOCK_BASE_URL: http://localhost:8090
     depends_on:
       - wiremock

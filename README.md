@@ -48,7 +48,7 @@ A production image is published on Docker Hub: **`alexssantos/wiremock-uix`** (`
 docker run -d -p 8081:8081 -e WIREMOCK_BASE_URL=http://localhost:8080 alexssantos/wiremock-uix:latest
 ```
 
-`WIREMOCK_BASE_URL` is injected at **container startup** (not build time) into `public/config.js`, so a single image can point at any WireMock instance. See [`docker-compose.yml`](./docker-compose.yml) for a full local stack (dashboard + WireMock), and [Section 9 of `IMPLEMENTATION_PLAN.md`](./IMPLEMENTATION_PLAN.md#9-docker) for details.
+`WIREMOCK_BASE_URL` is injected at **container startup** (not build time) into `public/config.js`, so a single image can point at any WireMock instance. See [`docker-compose.yml`](./docker-compose.yml) for a full local stack (dashboard + WireMock), and [`docs/13-deployment-operations.md`](./docs/13-deployment-operations.md) for the full deployment guide.
 
 To build the image locally:
 
@@ -56,6 +56,18 @@ To build the image locally:
 docker build -t wiremock-uix .
 docker run -d -p 8081:8081 wiremock-uix
 ```
+
+## Kubernetes
+
+Manifests are provided under [`k8s/`](./k8s) (Kustomize-based): a stateless **Deployment** for the dashboard and an optional **StatefulSet** for a companion WireMock instance with persistent storage. See [`docs/13-deployment-operations.md`](./docs/13-deployment-operations.md) for the full rationale, configuration reference, and rollout/rollback commands.
+
+```powershell
+kubectl apply -k k8s/
+```
+
+## Changelog
+
+See [`CHANGELOG.md`](./CHANGELOG.md) for release history (Keep a Changelog format).
 
 ## Project Structure
 

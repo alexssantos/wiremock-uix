@@ -1,0 +1,18 @@
+# Non-secret runtime configuration for the wiremock-uix container.
+# WIREMOCK_BASE_URL is consumed by docker/docker-entrypoint.sh at container
+# startup to regenerate /usr/share/nginx/html/config.js — it must be an
+# address reachable from the END USER'S BROWSER, not just from inside the
+# cluster network (e.g. a public Ingress host for WireMock, or a port-forward
+# / NodePort address during local testing). If you expose WireMock only
+# in-cluster, put a browser-reachable Ingress/reverse-proxy in front of it
+# first and point this at that address instead.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wiremock-uix-config
+  namespace: wiremock-dashboard
+  labels:
+    app.kubernetes.io/name: wiremock-uix
+    app.kubernetes.io/part-of: wiremock-dashboard
+data:
+  WIREMOCK_BASE_URL: "http://localhost:8080"
