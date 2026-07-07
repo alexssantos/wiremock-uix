@@ -15,6 +15,11 @@ services:
 
   wiremock-ui:
     image: alexssantos/wiremock-uix:latest
+    # Always check the registry for a newer digest of the "latest" tag, even
+    # if an image with that tag already exists locally. Without this, Docker
+    # Compose reuses whatever "latest" image is cached locally and silently
+    # skips new releases (`docker compose pull` also works as a one-off fix).
+    pull_policy: always
     # Uncomment to build locally instead of pulling from Docker Hub:
     # build:
     #   context: .

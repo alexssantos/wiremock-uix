@@ -68,6 +68,13 @@ docker run -d -p 8081:8081 -e WIREMOCK_BASE_URL=http://localhost:8080 alexssanto
 docker compose up
 ```
 
+> **Updating to a newer release**: `docker-compose.yml` pins `wiremock-ui` to the `:latest` tag with `pull_policy: always`, so `docker compose up` re-checks Docker Hub for a newer digest on every run. If you're on an older Compose version that ignores `pull_policy`, force it explicitly:
+> ```powershell
+> docker compose pull wiremock-ui
+> docker compose up -d
+> ```
+> Without either of these, Compose reuses whichever `wiremock-ui:latest` image is already cached locally and silently skips new releases — this bit us right after publishing v1.1.1.
+
 ### 4.4 Publishing a new image
 
 **Automated (preferred)**: [`.github/workflows/docker-publish.yml`](../.github/workflows/docker-publish.yml) builds and pushes `alexssantos/wiremock-uix:<version>` + `:latest` to Docker Hub whenever a `vX.Y.Z` git tag is pushed:

@@ -6,6 +6,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Fixed
+- `docker-compose.yml`: `wiremock-ui` now sets `pull_policy: always`, so `docker compose up` re-checks Docker Hub for a newer `:latest` digest instead of silently reusing whatever image is already cached locally (which meant new releases like v1.1.1 never showed up without a manual `docker compose pull`)
+
 ### Planned
 - Sprint 7 — polish, UX refinements, automated test coverage (Vitest + Testing Library + MSW), accessibility/performance audit (see `docs/07-plano-sprints.md`)
 - CI pipeline (lint + typecheck + test) on pull requests
