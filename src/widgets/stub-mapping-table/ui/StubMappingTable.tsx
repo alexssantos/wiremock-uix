@@ -98,10 +98,21 @@ export function StubMappingTable({ onImportRequested, onDeleteRequested }: StubM
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
+      const nextSearch = searchInput.trim();
+      // Bail out if the debounced value matches what's already in the URL.
+      // `setSearchParams` gets a new identity on every URL change (including
+      // page-only changes), so this effect re-runs on pagination too; without
+      // this guard it would unconditionally reset "page" back to 1 whenever
+      // the user navigated to another page, even though the search term
+      // never changed.
+      if (nextSearch === search) {
+        return;
+      }
+
       setSearchParams((currentParams) => {
         const nextParams = new URLSearchParams(currentParams);
-        if (searchInput.trim()) {
-          nextParams.set("search", searchInput.trim());
+        if (nextSearch) {
+          nextParams.set("search", nextSearch);
         } else {
           nextParams.delete("search");
         }
@@ -111,7 +122,7 @@ export function StubMappingTable({ onImportRequested, onDeleteRequested }: StubM
     }, 300);
 
     return () => window.clearTimeout(timeout);
-  }, [searchInput, setSearchParams]);
+  }, [searchInput, search, setSearchParams]);
 
   const allMappings = stubMappingsQuery.data?.mappings ?? [];
 

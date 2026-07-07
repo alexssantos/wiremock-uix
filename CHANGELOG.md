@@ -12,6 +12,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Code-splitting for the production bundle (Monaco/React Flow/Recharts currently ship in a single >1.4 MB chunk)
 - Richer scenario transition graph inferred from stub mappings' `requiredScenarioState`/`newScenarioState` (see `docs/12-roadmap.md`, v2)
 
+## [1.1.1] - 2026-07-08
+
+### Fixed
+- Stub Mappings list always snapping back to page 1 after navigating to page 2+. The search-debounce effect in `StubMappingTable` depended on `setSearchParams`, whose identity changes on every URL update (including pagination-only changes) in `react-router` v7. This caused the effect to re-fire on every "Next page" click, scheduling a debounce timeout that unconditionally reset the `page` URL param back to `1`. The effect now compares the debounced search term against the current URL `search` value and skips updating the URL entirely when unchanged, so pagination is no longer clobbered.
+
 ## [1.1.0] - 2026-07-07
 
 ### Added
