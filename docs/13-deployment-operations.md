@@ -151,6 +151,11 @@ kubectl apply -f k8s/namespace.yaml
 kubectl apply -k k8s/wiremock-uix/
 ```
 
+> **Convenience scripts**: [`k8s/scripts/`](../k8s/scripts) provides `deploy`/`update`/`remove` scripts (in both Bash and PowerShell) that wrap the commands above, add an optional `--namespace`/`--context` override for deploying into arbitrary namespaces or clusters without editing any manifest, and wait for the rollout to finish. See [`k8s/README.md`](../k8s/README.md) for full usage.
+> ```bash
+> ./k8s/scripts/deploy.sh --context my-cluster --namespace wiremock-staging
+> ```
+
 ### 5.3 Configuration reference
 
 | Setting | Where | Notes |
@@ -175,6 +180,12 @@ kubectl -n wiremock-dashboard rollout status deployment/wiremock-uix
 
 # Roll back if something goes wrong
 kubectl -n wiremock-dashboard rollout undo deployment/wiremock-uix
+```
+
+Or with the convenience script, which also re-applies any other pending manifest changes and waits for the rollout:
+
+```bash
+./k8s/scripts/update.sh --image-tag <new-version>
 ```
 
 Always update `CHANGELOG.md` and the `image:` tag in `k8s/wiremock-uix/deployment.yaml` together, so the deployed version and the documented version never drift apart.

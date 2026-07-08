@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+- `k8s/scripts/{deploy,update,remove}.{sh,ps1}` — cluster/namespace-agnostic scripts (Bash + PowerShell) to install, roll out updates to (optionally bumping the `wiremock-uix` image tag), and uninstall the application on any Kubernetes cluster, with an optional `--namespace`/`--context` override that doesn't require editing any checked-in manifest. See `k8s/README.md` for full usage.
+- `k8s/README.md` — dedicated Kubernetes deployment procedure documentation covering the new scripts, the namespace-override mechanism, multi-cluster/multi-environment usage, and troubleshooting.
+
 ### Fixed
 - `docker-compose.yml`: `wiremock-ui` now sets `pull_policy: always`, so `docker compose up` re-checks Docker Hub for a newer `:latest` digest instead of silently reusing whatever image is already cached locally (which meant new releases like v1.1.1 never showed up without a manual `docker compose pull`)
 
