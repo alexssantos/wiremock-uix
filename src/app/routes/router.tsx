@@ -10,6 +10,8 @@ import { RecordingPage } from "@/pages/recording/RecordingPage";
 import { SettingsPage } from "@/pages/settings/SettingsPage";
 import { FilesPage } from "@/pages/files/FilesPage";
 import { LogsPage } from "@/pages/logs/LogsPage";
+import { TemplatesPage } from "@/pages/templates/TemplatesPage";
+import { TemplateEditorPage } from "@/pages/templates/TemplateEditorPage";
 
 export const router = createBrowserRouter([
   {
@@ -21,6 +23,9 @@ export const router = createBrowserRouter([
       { path: "mappings", element: <StubMappingsListPage /> },
       { path: "mappings/new", element: <StubMappingEditorPage /> },
       { path: "mappings/:id", element: <StubMappingEditorPage /> },
+      { path: "templates", element: <TemplatesPage /> },
+      { path: "templates/new", element: <TemplateEditorPage /> },
+      { path: "templates/:id", element: <TemplateEditorPage /> },
       { path: "requests", element: <RequestsPage /> },
       { path: "near-misses", element: <NearMissesPage /> },
       { path: "scenarios", element: <ScenariosPage /> },

@@ -2,6 +2,7 @@ import { AlertCircle } from "lucide-react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useStubMapping } from "@/entities/stub-mapping";
 import { StubMappingWizard } from "@/features/create-stub-mapping";
+import type { CreateStubMappingFromTemplateNavigationState } from "@/features/create-stub-mapping-from-template";
 import type { DuplicateStubMappingNavigationState } from "@/features/duplicate-stub-mapping";
 import { PageHeader } from "@/shared/ui/page-header";
 import { Alert, AlertDescription, AlertTitle } from "@/shared/ui/alert";
@@ -13,7 +14,10 @@ export function StubMappingEditorPage() {
   const location = useLocation();
   const { id } = useParams<{ id: string }>();
   const stubMappingQuery = useStubMapping(id);
-  const duplicateState = (location.state as DuplicateStubMappingNavigationState | null)?.duplicatedStubMapping;
+  const navigationState = location.state as
+    | (DuplicateStubMappingNavigationState & CreateStubMappingFromTemplateNavigationState)
+    | null;
+  const duplicateState = navigationState?.duplicatedStubMapping ?? navigationState?.templateStubMapping;
   const isEditMode = Boolean(id);
 
   if (isEditMode && stubMappingQuery.isLoading) {

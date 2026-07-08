@@ -9,6 +9,12 @@ import {
   type StubMapping,
   type StubMappingFormDraft,
 } from "@/entities/stub-mapping";
+import {
+  stubTemplateCategoryValues,
+  type StubTemplate,
+  type StubTemplateCategory,
+  type StubTemplateInput,
+} from "@/entities/stub-template";
 import { useStubMappingForm } from "@/features/create-stub-mapping/model/use-stub-mapping-form";
 import { MetadataTab } from "@/features/create-stub-mapping/ui/tabs/MetadataTab";
 import { PreviewTab } from "@/features/create-stub-mapping/ui/tabs/PreviewTab";
@@ -17,12 +23,29 @@ import { ResponseTab } from "@/features/create-stub-mapping/ui/tabs/ResponseTab"
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Form } from "@/shared/ui/form";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/shared/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Textarea } from "@/shared/ui/textarea";
+
+const TEMPLATE_CATEGORY_LABELS: Record<StubTemplateCategory, string> = {
+  rest: "REST",
+  errors: "Errors",
+  latency: "Latency / faults",
+  auth: "Auth",
+  other: "Other",
+};
 
 type StubMappingWizardProps = {
   mode: "create" | "edit";
   defaultValues?: StubMapping;
   onSuccess?: (stubMapping: StubMapping) => void;
+  /** When "template", the wizard saves to the local template store instead of calling the WireMock API. Defaults to "wiremock". */
+  target?: "wiremock" | "template";
+  /** Pre-fills the "Template details" fields; required when `target` is "template" so `onSaveTemplate` can save an update. */
+  templateDefaults?: Pick<StubTemplate, "id" | "name" | "description" | "category">;
+  onSaveTemplate?: (input: StubTemplateInput) => void;
 };
 
 const tabDefinitions = [
@@ -32,11 +55,24 @@ const tabDefinitions = [
   { value: "preview", label: "Preview" },
 ] as const;
 
-export function StubMappingWizard({ mode, defaultValues, onSuccess }: StubMappingWizardProps) {
+export function StubMappingWizard({
+  mode,
+  defaultValues,
+  onSuccess,
+  target = "wiremock",
+  templateDefaults,
+  onSaveTemplate,
+}: StubMappingWizardProps) {
   const form = useStubMappingForm(defaultValues);
   const createStubMapping = useCreateStubMapping();
   const updateStubMapping = useUpdateStubMapping();
   const [activeTab, setActiveTab] = useState<ComponentProps<typeof Tabs>["defaultValue"]>("request");
+  const isTemplateTarget = target === "template";
+
+  const [templateName, setTemplateName] = useState(templateDefaults?.name ?? "");
+  const [templateDescription, setTemplateDescription] = useState(templateDefaults?.description ?? "");
+  const [templateCategory, setTemplateCategory] = useState<StubTemplateCategory>(templateDefaults?.category ?? "other");
+  const [templateNameError, setTemplateNameError] = useState<string | null>(null);
 
   const isSubmitting = createStubMapping.isPending || updateStubMapping.isPending;
 
@@ -46,6 +82,24 @@ export function StubMappingWizard({ mode, defaultValues, onSuccess }: StubMappin
       // avoid TS "excessively deep" instantiation errors (see schema.ts);
       // cast back to the entity's `StubMappingFormDraft` shape here.
       const stubMapping = generateStubMappingJson(values as StubMappingFormDraft);
+
+      if (isTemplateTarget) {
+        if (!templateName.trim()) {
+          setTemplateNameError("Enter a name for this template.");
+          setActiveTab("request");
+          toast.error("Please fill in the template details before saving.");
+          return;
+        }
+        setTemplateNameError(null);
+        onSaveTemplate?.({
+          id: templateDefaults?.id,
+          name: templateName.trim(),
+          description: templateDescription.trim() || undefined,
+          category: templateCategory,
+          stubMapping,
+        });
+        return;
+      }
 
       try {
         const existingId = values.id ?? values.uuid ?? defaultValues?.id ?? defaultValues?.uuid;
@@ -67,9 +121,66 @@ export function StubMappingWizard({ mode, defaultValues, onSuccess }: StubMappin
   return (
     <Form {...form}>
       <form onSubmit={(event) => void handleSubmit(event)} className="space-y-6">
+        {isTemplateTarget ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Template details</CardTitle>
+              <CardDescription>
+                Give this reusable stub blueprint a name and category so it&apos;s easy to find later on the Templates page.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4 lg:grid-cols-3">
+              <div className="space-y-2 lg:col-span-2">
+                <Label htmlFor="template-name">Template name</Label>
+                <Input
+                  id="template-name"
+                  placeholder="REST: Get resource by id"
+                  value={templateName}
+                  onChange={(event) => {
+                    setTemplateName(event.target.value);
+                    if (templateNameError) setTemplateNameError(null);
+                  }}
+                />
+                {templateNameError ? <p className="text-sm text-destructive">{templateNameError}</p> : null}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="template-category">Category</Label>
+                <Select value={templateCategory} onValueChange={(value) => setTemplateCategory(value as StubTemplateCategory)}>
+                  <SelectTrigger id="template-category">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {stubTemplateCategoryValues.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {TEMPLATE_CATEGORY_LABELS[category]}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2 lg:col-span-3">
+                <Label htmlFor="template-description">Description</Label>
+                <Textarea
+                  id="template-description"
+                  placeholder="What is this template useful for?"
+                  rows={2}
+                  value={templateDescription}
+                  onChange={(event) => setTemplateDescription(event.target.value)}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        ) : null}
+
         <Card>
           <CardHeader>
-            <CardTitle>{mode === "edit" ? "Edit stub mapping" : "Create stub mapping"}</CardTitle>
+            <CardTitle>
+              {isTemplateTarget
+                ? "Template stub mapping"
+                : mode === "edit" ? "Edit stub mapping" : "Create stub mapping"}
+            </CardTitle>
             <CardDescription>
               Configure request matching, response behavior, metadata, and preview the final JSON before saving.
             </CardDescription>
@@ -105,10 +216,12 @@ export function StubMappingWizard({ mode, defaultValues, onSuccess }: StubMappin
 
           <CardFooter className="justify-between gap-3 border-t pt-6">
             <Button type="button" variant="outline" asChild>
-              <Link to="/mappings">Cancel</Link>
+              <Link to={isTemplateTarget ? "/templates" : "/mappings"}>Cancel</Link>
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Saving..." : mode === "edit" ? "Save changes" : "Create stub mapping"}
+              {isTemplateTarget
+                ? templateDefaults?.id ? "Save template" : "Create template"
+                : isSubmitting ? "Saving..." : mode === "edit" ? "Save changes" : "Create stub mapping"}
             </Button>
           </CardFooter>
         </Card>

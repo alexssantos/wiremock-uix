@@ -8,7 +8,7 @@ import {
   useReactTable,
   type RowSelectionState,
 } from "@tanstack/react-table";
-import { AlertCircle, Copy, Download, MoreHorizontal, Pencil, Plus, Search, Trash2, Webhook } from "lucide-react";
+import { AlertCircle, Copy, Download, LayoutTemplate, MoreHorizontal, Pencil, Plus, Search, Trash2, Webhook } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import type { HttpMethod } from "@/shared/types/common";
 import type { StubMapping } from "@/entities/stub-mapping";
@@ -16,6 +16,7 @@ import { useStubMappings } from "@/entities/stub-mapping";
 import { useDuplicateStubMapping } from "@/features/duplicate-stub-mapping";
 import { useExportStubMappings } from "@/features/export-stub-mappings";
 import { FavoriteToggle, useFavoriteStubMappings } from "@/features/favorite-stub-mapping";
+import { SaveAsTemplateDialog } from "@/features/manage-stub-templates";
 import { Button } from "@/shared/ui/button";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { EmptyState } from "@/shared/ui/empty-state";
@@ -85,6 +86,7 @@ export function StubMappingTable({ onImportRequested, onDeleteRequested }: StubM
   const exportStubMappings = useExportStubMappings();
   const { favoriteIds } = useFavoriteStubMappings();
   const stubMappingsQuery = useStubMappings({});
+  const [templateSourceStub, setTemplateSourceStub] = useState<StubMapping | null>(null);
 
   const search = searchParams.get("search") ?? "";
   const methodFilter = (searchParams.get("method") as HttpMethod | null) ?? null;
@@ -240,6 +242,10 @@ export function StubMappingTable({ onImportRequested, onDeleteRequested }: StubM
               <DropdownMenuItem onClick={() => duplicateStubMapping(mapping)}>
                 <Copy className="size-4" />
                 Duplicate
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTemplateSourceStub(mapping)}>
+                <LayoutTemplate className="size-4" />
+                Save as template
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => exportStubMappings(mapping)}>
                 <Download className="size-4" />
@@ -526,6 +532,14 @@ export function StubMappingTable({ onImportRequested, onDeleteRequested }: StubM
           </div>
         </>
       ) : null}
+
+      <SaveAsTemplateDialog
+        open={Boolean(templateSourceStub)}
+        onOpenChange={(open) => {
+          if (!open) setTemplateSourceStub(null);
+        }}
+        stubMapping={templateSourceStub}
+      />
     </div>
   );
 }

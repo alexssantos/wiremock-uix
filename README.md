@@ -7,6 +7,7 @@ Full technical specification (architecture, design system, endpoint mapping, Typ
 ## Features
 
 - **Stub Mappings** — list, create (multi-tab wizard), edit, duplicate, delete, import/export, favorites
+- **Templates** — save any stub mapping as a reusable request/response blueprint (or start from one of 10 built-in templates) and create new stub mappings from it in one click
 - **Requests** (journal) — filterable log of all requests WireMock has received, with a detail drawer, replay, and "generate stub from request"
 - **Near Misses** — investigate unmatched requests with a side-by-side diff against the closest stub
 - **Dashboard** — aggregate metrics and charts (requests/min, HTTP methods, status codes, top URLs)

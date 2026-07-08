@@ -6,7 +6,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-07-09
+
 ### Added
+- Stub Templates — a new "Templates" section (`/templates`) for saving and reusing pre-configured request/response blueprints:
+  - `src/entities/stub-template` — `StubTemplate` domain model, 10 curated built-in templates (REST list/get/create/update/delete, 404/401/500 errors, fixed-delay latency, connection-reset fault), and a LocalStorage-backed `useStubTemplates` CRUD hook (same persistence pattern as favorites)
+  - `StubMappingWizard` now accepts a `target="template"` mode, reusing the existing Request/Response/Metadata/Preview tabs to create and edit templates alongside a small "Template details" (name/description/category) section
+  - "Save as template" action on the Stub Mappings table's row menu, to snapshot an already-created stub mapping into a reusable template
+  - "Use template" action that prefills the stub mapping wizard from a template (mirrors the existing "Duplicate" navigation-state pattern) so creating a stub from a template takes one click plus a review pass
+  - Built-in templates are read-only (duplicate to get an editable custom copy); custom templates can be freely edited/duplicated/deleted
+  - New `/templates`, `/templates/new`, `/templates/:id` routes, sidebar nav entry, and command-palette (Ctrl/Cmd+K) entries
 - `k8s/scripts/{deploy,update,remove}.{sh,ps1}` — cluster/namespace-agnostic scripts (Bash + PowerShell) to install, roll out updates to (optionally bumping the `wiremock-uix` image tag), and uninstall the application on any Kubernetes cluster, with an optional `--namespace`/`--context` override that doesn't require editing any checked-in manifest. See `k8s/README.md` for full usage.
 - `k8s/README.md` — dedicated Kubernetes deployment procedure documentation covering the new scripts, the namespace-override mechanism, multi-cluster/multi-environment usage, and troubleshooting.
 

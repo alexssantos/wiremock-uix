@@ -5,6 +5,7 @@ import {
   FolderOpen,
   GitBranch,
   LayoutDashboard,
+  LayoutTemplate,
   Radio,
   ScrollText,
   Settings,
@@ -22,6 +23,7 @@ type NavItemConfig = {
 const NAV_ITEMS: NavItemConfig[] = [
   { label: "Dashboard", to: "/dashboard", icon: LayoutDashboard },
   { label: "Stub Mappings", to: "/mappings", icon: Webhook },
+  { label: "Templates", to: "/templates", icon: LayoutTemplate },
   { label: "Requests", to: "/requests", icon: Activity },
   { label: "Near Misses", to: "/near-misses", icon: Crosshair },
   { label: "Scenarios", to: "/scenarios", icon: GitBranch },
