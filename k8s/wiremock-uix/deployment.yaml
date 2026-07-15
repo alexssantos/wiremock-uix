@@ -28,6 +28,57 @@ spec:
         app.kubernetes.io/name: wiremock-uix
         app.kubernetes.io/part-of: wiremock-dashboard
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        runAsGroup: 101
+        fsGroup: 101
+        seccompProfile:
+          type: RuntimeDefault
+      # Renders config.js from WIREMOCK_BASE_URL onto a shared emptyDir
+      # before the main container starts, because the main container's root
+      # filesystem is read-only and can no longer write it at runtime (see
+      # docker/docker-entrypoint.sh, which becomes a no-op in that case).
+      initContainers:
+        - name: render-config
+          image: busybox:1.36
+          command:
+            - "sh"
+            - "-c"
+            - |
+              set -eu
+              BASE_URL="${WIREMOCK_BASE_URL:-http://localhost:8080}"
+              case "$BASE_URL" in
+                http://*|https://*) ;;
+                *)
+                  echo "ERROR: WIREMOCK_BASE_URL '${BASE_URL}' must start with http:// or https://" >&2
+                  exit 1
+                  ;;
+              esac
+              if ! printf '%s' "$BASE_URL" | grep -Eq '^https?://[A-Za-z0-9.-]+(:[0-9]+)?/?$'; then
+                echo "ERROR: WIREMOCK_BASE_URL '${BASE_URL}' failed validation" >&2
+                exit 1
+              fi
+              cat > /rendered/config.js <<EOF
+              window.__WIREMOCK_UI_CONFIG__ = {
+                wiremockBaseUrl: "${BASE_URL}"
+              };
+              EOF
+              echo "config.js rendered with wiremockBaseUrl=${BASE_URL}"
+          envFrom:
+            - configMapRef:
+                name: wiremock-uix-config
+          volumeMounts:
+            - name: config-js
+              mountPath: /rendered
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
       containers:
         - name: wiremock-uix
           image: alexssantos/wiremock-uix:1.1.0
@@ -62,14 +113,32 @@ spec:
             periodSeconds: 20
             timeoutSeconds: 3
             failureThreshold: 3
+          volumeMounts:
+            - name: config-js
+              mountPath: /usr/share/nginx/html/config.js
+              subPath: config.js
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+            - name: var-cache-nginx
+              mountPath: /var/cache/nginx
+            - name: var-run
+              mountPath: /var/run
           securityContext:
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
-            # The official nginx:alpine image starts its master process as
-            # root and drops privileges internally for worker processes; it
-            # also needs a writable filesystem to render config.js and nginx
-            # runtime files (pid/cache/logs), so readOnlyRootFilesystem is
-            # left disabled here. Swap to an "nginx-unprivileged" base image
-            # in the Dockerfile if a stricter, fully non-root pod is required.
+      volumes:
+        - name: config-js
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+        - name: var-cache-nginx
+          emptyDir: {}
+        - name: var-run
+          emptyDir: {}
       restartPolicy: Always

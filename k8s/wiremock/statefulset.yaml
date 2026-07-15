@@ -36,6 +36,22 @@ spec:
         app.kubernetes.io/name: wiremock
         app.kubernetes.io/part-of: wiremock-dashboard
     spec:
+      # The wiremock/wiremock image has no USER directive (its base image
+      # defaults to root) and defines no dedicated user in /etc/passwd, but
+      # Linux/Kubernetes let a container run as any numeric UID without one:
+      # the JVM does no NSS lookups for basic file I/O. UID/GID 1000 is
+      # therefore an arbitrary, unprivileged choice here, not one baked into
+      # the image. fsGroup ensures the PersistentVolumeClaim mounted below is
+      # group-writable by that same GID regardless of the underlying storage
+      # driver's default ownership, so the container can write
+      # mappings/__files without root.
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       # Seeds a brand-new PersistentVolumeClaim with 30 example stub mappings
       # (3 sample REST APIs: Users, Products, Orders) on first boot only. If
       # /home/wiremock/mappings already has files — e.g. after a pod restart,
@@ -56,6 +72,13 @@ spec:
               else
                 echo "wiremock/mappings already has content — skipping example seed"
               fi
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
             - name: wiremock-data
               mountPath: /home/wiremock
@@ -99,6 +122,14 @@ spec:
             periodSeconds: 20
             timeoutSeconds: 3
             failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            # WireMock persists stub mappings, uploaded __files, and its
+            # request journal to /home/wiremock (the PVC below), so the root
+            # filesystem cannot be made fully read-only for this workload.
+            readOnlyRootFilesystem: false
       volumes:
         - name: seed-mappings
           configMap:
